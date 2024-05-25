@@ -24,6 +24,7 @@ type Service interface {
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
+	CreateUser() error
 }
 
 type service struct {

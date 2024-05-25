@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"hms-api/routes"
+
 	"log"
 	"net/http"
 
@@ -26,7 +27,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	v1Router := chi.NewRouter()
 	r.Mount("/api/v1", v1Router)
-	routes.RegisterUserRoutes(v1Router)
+	userHandler := routes.NewUserHandler(s.db)
+	userHandler.RegisterUserRoutes(v1Router)
 
 	return r
 }
