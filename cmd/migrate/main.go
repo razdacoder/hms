@@ -3,7 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"hms-api/internal/users"
+	"hms-api/models"
+
 	"log"
 	"os"
 
@@ -39,6 +40,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	gormDB.AutoMigrate(&users.User{})
+	gormDB.AutoMigrate(&models.User{})
 	log.Println("Migration Complete")
 }

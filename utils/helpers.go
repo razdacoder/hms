@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"net/http"
 )
 
@@ -22,13 +21,4 @@ func Decode[T any](r *http.Request) (T, error) {
 		return v, fmt.Errorf("decode json: %w", err)
 	}
 	return v, nil
-}
-
-func ServerError(w http.ResponseWriter, r *http.Request, err error) {
-	Encode(w, http.StatusInternalServerError, fmt.Errorf("internal server error"))
-	slog.Debug("New Error: %s from %s", err.Error(), r.RequestURI)
-}
-
-func BadRequestError(err error, w http.ResponseWriter, r *http.Request) {
-	Encode(w, http.StatusBadRequest, err.Error())
 }

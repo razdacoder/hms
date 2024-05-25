@@ -2,20 +2,31 @@ package server
 
 import (
 	"encoding/json"
+	"hms-api/routes"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-
-	r.Get("/", s.HelloWorldHandler)
-
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	}))
 	r.Get("/health", s.healthHandler)
+
+	v1Router := chi.NewRouter()
+	r.Mount("/api/v1", v1Router)
+	routes.RegisterUserRoutes(v1Router)
 
 	return r
 }
