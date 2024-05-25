@@ -57,6 +57,7 @@ func New() Service {
 	dbInstance = &service{
 		db: gormDB,
 	}
+	log.Println("DB Connected Successfully")
 	return dbInstance
 }
 
