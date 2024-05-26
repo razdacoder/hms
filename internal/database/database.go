@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/postgres"
@@ -19,16 +20,18 @@ import (
 
 // Service represents a service that interacts with a database.
 type Service interface {
-	// Health returns a map of health status information.
-	// The keys and values in the map are service-specific.
+	// System
 	Health() map[string]string
-
-	// Close terminates the database connection.
-	// It returns an error if the connection cannot be closed.
 	Close() error
+
+	// User
 	CreateUser(*types.CreateUserPayload) error
 	GetUserByUsername(string) (*models.User, error)
 	UserExists(string) (bool, error)
+	GetUserByID(uuid.UUID) (*models.User, error)
+	UpdateUser(uuid.UUID, *types.UpdateUserPayload) error
+	DeleteUser(uuid.UUID) error
+	ChangePassword(uuid.UUID, string) error
 }
 
 type service struct {
