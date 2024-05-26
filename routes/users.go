@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"fmt"
 	"hms-api/internal/database"
+	"hms-api/types"
 	"hms-api/utils"
 	"net/http"
 
@@ -29,6 +31,44 @@ func (handler *UserHandler) RegisterUserRoutes(router chi.Router) {
 }
 
 func (handler *UserHandler) handleRegisterUser(w http.ResponseWriter, r *http.Request) {
-	_ = handler.db.CreateUser()
-	utils.Encode(w, http.StatusOK, map[string]string{"message": "Hello"})
+
+	payload, err := utils.Decode[*types.CreateUserPayload](r)
+	if err != nil {
+		utils.InvalidJson(w)
+		return
+	}
+
+	if err := utils.Validate.Struct(payload); err != nil {
+		utils.InvalidRequestData(w, utils.ErrorMap(err))
+		return
+	}
+
+	hashPassword, err := utils.HashPassword(payload.Password)
+
+	if err != nil {
+		utils.ServerError(w, r, err)
+		return
+	}
+
+	userExists, err := handler.db.UserExists(payload.Username)
+
+	if err != nil {
+		utils.ServerError(w, r, err)
+		return
+	}
+
+	if userExists {
+		utils.APIError(w, http.StatusBadRequest, fmt.Errorf("user already exists"))
+		return
+	}
+
+	payload.Password = hashPassword
+
+	err = handler.db.CreateUser(payload)
+
+	if err != nil {
+		utils.ServerError(w, r, err)
+		return
+	}
+	utils.Encode(w, http.StatusCreated, map[string]string{"message": "User Created"})
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"hms-api/models"
+	"hms-api/types"
 	"log"
 	"os"
 	"strconv"
@@ -24,7 +26,9 @@ type Service interface {
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
-	CreateUser() error
+	CreateUser(*types.CreateUserPayload) error
+	GetUserByUsername(string) (*models.User, error)
+	UserExists(string) (bool, error)
 }
 
 type service struct {
