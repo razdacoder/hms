@@ -5,6 +5,7 @@
 @layer base {
   html {
     font-family: "Lato", system-ui, sans-serif;
+    font-weight: 400;
   }
 
   :root {
