@@ -32,6 +32,13 @@ type Service interface {
 	UpdateUser(uuid.UUID, *types.UpdateUserPayload) error
 	DeleteUser(uuid.UUID) error
 	ChangePassword(uuid.UUID, string) error
+
+	// Rooms
+	GetRooms() ([]models.Room, error)
+	CreateRoom(*types.CreateRoomPayload) error
+	GetRoom(uuid.UUID) (*models.Room, error)
+	UpdateRoom(uuid.UUID, *types.UpdateRoomPayload) error
+	DeleteRoom(uuid.UUID) error
 }
 
 type service struct {

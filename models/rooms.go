@@ -101,7 +101,7 @@ func (e FOStatus) Value() (interface{}, error) {
 type BedType string
 
 const (
-	Single BedType = "Twin Size "
+	Single BedType = "Twin Size"
 	Double BedType = "Double Size"
 	King   BedType = "King Size"
 )
@@ -124,7 +124,7 @@ type Room struct {
 	ID                uuid.UUID          `gorm:"primary_key;type:uuid;default:uuid_generate_v4()" json:"id"`
 	RoomType          *RoomType          `gorm:"type:room_type;default:Standard;not null" json:"room_type"`
 	RoomNumber        string             `gorm:"type:text;not null" json:"room_number"`
-	Price             float64            `gorm:"type:decimal(10, 2)" json:"price"`
+	Price             float64            `gorm:"type:decimal(10, 2);not null" json:"price"`
 	RoomStatus        *RoomStatus        `gorm:"type:room_status;default:Clean;not null" json:"room_status"`
 	ReturnStatus      string             `gorm:"type:text" json:"return_status"`
 	ReservationStatus *ReservationStatus `gorm:"type:res_status;default:Not Reserved;not null" json:"res_status"`

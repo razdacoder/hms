@@ -29,6 +29,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Mount("/api/v1", v1Router)
 	userHandler := routes.NewUserHandler(s.db)
 	userHandler.RegisterUserRoutes(v1Router)
+	roomsHandler := routes.NewRoomHandler(s.db)
+	roomsHandler.RegisterUserRoutes(v1Router)
 
 	return r
 }
