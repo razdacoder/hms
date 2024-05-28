@@ -37,10 +37,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	filesDir := http.Dir(filepath.Join(workDir, "uploads"))
 	FileServer(r, "/uploads", filesDir)
 	r.Get("/health", s.healthHandler)
-	r.Post("/upload", s.uploadHandler)
-	r.Delete("/delete-file", s.deleteHandler)
+
 	v1Router := chi.NewRouter()
 	r.Mount("/api/v1", v1Router)
+	v1Router.Post("/upload", s.uploadHandler)
+	v1Router.Delete("/delete-file", s.deleteHandler)
 	userHandler := routes.NewUserHandler(s.db)
 	userHandler.RegisterUserRoutes(v1Router)
 	roomsHandler := routes.NewRoomHandler(s.db)

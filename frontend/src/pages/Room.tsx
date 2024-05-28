@@ -3,7 +3,7 @@ import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { columns } from "@/features/rooms/components/columns";
-import { CreateRoomDialog } from "@/features/rooms/components/room-dialog";
+import { RoomDialog } from "@/features/rooms/components/room-dialog";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Filter } from "lucide-react";
@@ -60,7 +60,7 @@ export default function Room() {
             <Filter className="size-4" />
             Filter
           </Button>
-          <CreateRoomDialog />
+          <RoomDialog />
         </div>
       </div>
       {roomsLoading && (

@@ -3,17 +3,17 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Save } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import RoomForm from "./room-form";
 
-export function CreateRoomDialog() {
+export function RoomDialog() {
   const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -29,15 +29,7 @@ export function CreateRoomDialog() {
             Enter room details. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
-        <RoomForm />
-
-        <DialogFooter>
-          <Button variant="outline">Close</Button>
-          <Button type="submit" className="flex items-center gap-x-2">
-            <Save className="size-4" />
-            Save changes
-          </Button>
-        </DialogFooter>
+        <RoomForm setIsOpen={(value) => setIsOpen(value)} />
       </DialogContent>
     </Dialog>
   );

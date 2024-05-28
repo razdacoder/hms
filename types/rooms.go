@@ -1,6 +1,10 @@
 package types
 
-import "hms-api/models"
+import (
+	"hms-api/models"
+
+	"github.com/lib/pq"
+)
 
 type CreateRoomPayload struct {
 	RoomType    string   `json:"room_type" validate:"required"`
@@ -46,7 +50,7 @@ func ParseUpdates(payload *UpdateRoomPayload) map[string]interface{} {
 	}
 
 	if payload.ReservationStatus != "" {
-		_updates["res_status"] = (*models.ReservationStatus)(&payload.ReservationStatus)
+		_updates["reservation_status"] = (*models.ReservationStatus)(&payload.ReservationStatus)
 	}
 
 	if payload.BedType != "" {
@@ -65,12 +69,19 @@ func ParseUpdates(payload *UpdateRoomPayload) map[string]interface{} {
 		_updates["max_capacity"] = payload.MaxCapacity
 	}
 
-	if payload.Images != nil {
-		_updates["images"] = payload.Images
+	// if payload.Images != nil {
+	// 	_updates["images"] = payload.Images
+	// }
+
+	// if payload.Amenities != nil {
+	// 	_updates["amenities"] = payload.Amenities
+	// }
+	if len(payload.Amenities) > 0 {
+		_updates["amenities"] = pq.Array(payload.Amenities)
 	}
 
-	if payload.Amenities != nil {
-		_updates["amenities"] = payload.Amenities
+	if len(payload.Images) > 0 {
+		_updates["images"] = pq.Array(payload.Images)
 	}
 
 	return _updates
