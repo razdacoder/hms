@@ -6,7 +6,6 @@ import { columns } from "@/features/rooms/components/columns";
 import { RoomDialog } from "@/features/rooms/components/room-dialog";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Filter } from "lucide-react";
 import { useState } from "react";
 
 export default function Room() {
@@ -56,10 +55,6 @@ export default function Room() {
           </Button>
         </div>
         <div className="flex gap-x-3 items-center">
-          <Button variant="outline" className="flex items-center gap-x-2">
-            <Filter className="size-4" />
-            Filter
-          </Button>
           <RoomDialog />
         </div>
       </div>
