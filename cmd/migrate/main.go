@@ -40,6 +40,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	gormDB.AutoMigrate(&models.User{}, &models.Room{})
+	gormDB.AutoMigrate(&models.User{}, &models.Room{}, &models.Guest{}, &models.Booking{})
 	log.Println("Migration Complete")
 }

@@ -46,6 +46,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	userHandler.RegisterUserRoutes(v1Router)
 	roomsHandler := routes.NewRoomHandler(s.db)
 	roomsHandler.RegisterUserRoutes(v1Router)
+	bookingsHandler := routes.NewBookingHandler(s.db)
+	bookingsHandler.RegisterUserRoutes(v1Router)
 
 	return r
 }

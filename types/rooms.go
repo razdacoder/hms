@@ -30,7 +30,7 @@ type UpdateRoomPayload struct {
 	Images            []string `json:"images"`
 }
 
-func ParseUpdates(payload *UpdateRoomPayload) map[string]interface{} {
+func ParseRoomUpdates(payload *UpdateRoomPayload) map[string]interface{} {
 	_updates := make(map[string]interface{})
 
 	if payload.RoomType != "" {

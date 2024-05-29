@@ -133,6 +133,7 @@ type Room struct {
 	MaxCapacity       int                `gorm:"type:int;not null" json:"max_capacity"`
 	Amenities         pq.StringArray     `gorm:"type:text[];not null" json:"amenities"`
 	Images            pq.StringArray     `gorm:"type:text[];not null" json:"images"`
+	Bookings          []Booking          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"bookings,omitempty"`
 	CreatedAt         time.Time          `gorm:"auto_now_add" json:"created_at"`
 	UpdatedAt         time.Time          `gorm:"auto_now" json:"updated_at"`
 }

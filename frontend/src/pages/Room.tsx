@@ -74,7 +74,7 @@ export default function Room() {
         </div>
       )}
       {rooms && (
-        <div className="mt-4 bg-white drop-shadow-sm p-4">
+        <div className="mt-6 bg-white drop-shadow-sm p-4 rounded-md">
           <DataTable columns={columns} data={rooms} />
         </div>
       )}

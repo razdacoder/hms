@@ -34,7 +34,7 @@ func (s *service) GetRoom(id uuid.UUID) (*models.Room, error) {
 }
 
 func (s *service) UpdateRoom(id uuid.UUID, payload *types.UpdateRoomPayload) error {
-	_updates := types.ParseUpdates(payload)
+	_updates := types.ParseRoomUpdates(payload)
 	result := s.db.Model(&models.Room{}).Where("id = ?", id).Updates(_updates)
 	return result.Error
 }
