@@ -13,6 +13,7 @@ type Guest struct {
 	Email       string    `gorm:"type:text;unique;not null" json:"email"`
 	PhoneNumber string    `gorm:"type:text;unique;not null" json:"phone_number"`
 	Address     string    `gorm:"type:text;not null" json:"address"`
+	Bookings    []Booking `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"bookings,omitempty"`
 }
 
 type Booking struct {

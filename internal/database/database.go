@@ -39,6 +39,7 @@ type Service interface {
 	GetRoom(uuid.UUID) (*models.Room, error)
 	UpdateRoom(uuid.UUID, *types.UpdateRoomPayload) error
 	DeleteRoom(uuid.UUID) error
+	GetBookingRooms(string) ([]models.Room, error)
 
 	// Bookings
 	GetBookings() ([]models.Booking, error)

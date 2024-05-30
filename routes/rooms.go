@@ -27,6 +27,7 @@ func roomsRouter(handler *RoomHandler) chi.Router {
 	router := chi.NewRouter()
 	router.Get("/", handler.handleGetRooms)
 	router.With(middlewares.IsLoggedIn, middlewares.IsLevel4).Post("/", handler.handleCreateRoom)
+	router.Get("/book", handler.handleBookingRoom)
 	router.Route("/{id}", func(router chi.Router) {
 		router.Use(middlewares.IsLoggedIn)
 		router.Get("/", handler.handleGetRoom)
@@ -153,4 +154,16 @@ func (handler *RoomHandler) handleDeleteRoom(w http.ResponseWriter, r *http.Requ
 	}
 
 	utils.Encode(w, http.StatusOK, map[string]string{"message": "Room deleted"})
+}
+
+func (handler *RoomHandler) handleBookingRoom(w http.ResponseWriter, r *http.Request) {
+	room_type := r.URL.Query().Get("room_type")
+
+	rooms, err := handler.db.GetBookingRooms(room_type)
+	if err != nil {
+		utils.ServerError(w, r, err)
+		return
+	}
+
+	utils.Encode(w, http.StatusOK, rooms)
 }

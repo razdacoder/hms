@@ -39,3 +39,11 @@ export const deleteRoom = async (id: string) => {
   }
   return response.data;
 };
+
+export const getBookingRooms = async (room_type: string) => {
+  const response = await api.get(`/rooms/book?room_type=${room_type}`);
+  if (response.status != 200) {
+    throw new Error("Failed to fetch rooms");
+  }
+  return response.data as Room[];
+};

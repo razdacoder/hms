@@ -1,4 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox";
+import { formatPrice } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DiscAlbum,
@@ -114,6 +115,15 @@ export const columns: ColumnDef<Room>[] = [
           {getResStatus(res_status)} {res_status}
         </span>
       );
+    },
+  },
+  {
+    accessorKey: "price",
+    header: "Room Price",
+    cell: ({ row }) => {
+      const { price } = row.original;
+
+      return <span>{formatPrice(price)}</span>;
     },
   },
   {

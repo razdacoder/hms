@@ -43,3 +43,11 @@ func (s *service) DeleteRoom(id uuid.UUID) error {
 	result := s.db.Delete(&models.Room{}, id)
 	return result.Error
 }
+
+func (s *service) GetBookingRooms(room_type string) ([]models.Room, error) {
+	var rooms []models.Room
+	stat := "Vacant"
+	clean := "Clean"
+	result := s.db.Model(&models.Room{}).Where(&models.Room{RoomType: (*models.RoomType)(&room_type), FOStatus: (*models.FOStatus)(&stat), RoomStatus: (*models.RoomStatus)(&clean), ReturnStatus: "Ready"}).Find(&rooms)
+	return rooms, result.Error
+}

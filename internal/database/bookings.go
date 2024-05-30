@@ -16,13 +16,13 @@ func (s *service) GetGuests() ([]models.Guest, error) {
 
 func (s *service) GetBookings() ([]models.Booking, error) {
 	var bookings []models.Booking
-	result := s.db.Model(&models.Booking{}).Find(&bookings)
+	result := s.db.Model(&models.Booking{}).Preload("Guest").Find(&bookings)
 	return bookings, result.Error
 }
 
 func (s *service) GetBooking(id uuid.UUID) (*models.Booking, error) {
 	var booking models.Booking
-	result := s.db.Model(&models.Booking{}).Where("id = ?", id).First(&booking)
+	result := s.db.Model(&models.Booking{}).Where("id = ?", id).Preload("Guest").First(&booking)
 	return &booking, result.Error
 }
 

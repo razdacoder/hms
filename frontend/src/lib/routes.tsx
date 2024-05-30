@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import NewBooking from "@/features/bookings/components/NewBooking";
 import Booking from "@/pages/Booking";
 import Dashboard from "@/pages/Dashboard";
 import ErrorPage from "@/pages/ErrorPage";
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: "/settings",
         element: <Settings />,
+      },
+      {
+        path: "/bookings/new",
+        element: <NewBooking />,
       },
     ],
   },
