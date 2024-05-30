@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import BookingDetail from "@/features/bookings/components/BookingDetail";
 import NewBooking from "@/features/bookings/components/NewBooking";
 import Booking from "@/pages/Booking";
 import Dashboard from "@/pages/Dashboard";
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
       {
         path: "/bookings/new",
         element: <NewBooking />,
+      },
+      {
+        path: "/bookings/:id",
+        element: <BookingDetail />,
       },
     ],
   },

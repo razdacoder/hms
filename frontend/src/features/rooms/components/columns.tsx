@@ -3,6 +3,7 @@ import { formatPrice } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DiscAlbum,
+  LogInIcon,
   LogOut,
   Minus,
   Paintbrush,
@@ -36,10 +37,10 @@ const getResStatus = (status: string) => {
     return <DiscAlbum className="size-4 text-slate-400" />;
   }
   if (status === "Departed") {
-    return <LogOut className="size-4 text-blue-400" />;
+    return <LogOut className="size-4 text-red-400" />;
   }
   if (status === "In House") {
-    return <ShieldX className="size-4 text-red-400" />;
+    return <LogInIcon className="size-4 text-blue-400" />;
   }
 };
 

@@ -16,13 +16,13 @@ func (s *service) GetGuests() ([]models.Guest, error) {
 
 func (s *service) GetBookings() ([]models.Booking, error) {
 	var bookings []models.Booking
-	result := s.db.Model(&models.Booking{}).Preload("Guest").Find(&bookings)
+	result := s.db.Model(&models.Booking{}).Preload("Guest").Preload("Room").Find(&bookings)
 	return bookings, result.Error
 }
 
 func (s *service) GetBooking(id uuid.UUID) (*models.Booking, error) {
 	var booking models.Booking
-	result := s.db.Model(&models.Booking{}).Where("id = ?", id).Preload("Guest").First(&booking)
+	result := s.db.Model(&models.Booking{}).Where("id = ?", id).Preload("Guest").Preload("Room").First(&booking)
 	return &booking, result.Error
 }
 
@@ -59,9 +59,21 @@ func (s *service) CreateBooking(payload *types.CreateBookingPayload) error {
 		GuestID:       guest.ID,
 		Price:         payload.Price,
 	}
+
+	fo_stat := "Occupied"
+
 	if err := tx.Create(booking).Error; err != nil {
 		tx.Rollback()
 		return err
+	}
+
+	if payload.ReservationStatus != "" {
+		// booking.Room.ReservationStatus = (*models.ReservationStatus)(&payload.ReservationStatus)
+		// booking.Room.FOStatus = (*models.FOStatus)(&fo_stat)
+		if err := tx.Model(&models.Room{}).Where("id", booking.RoomID).Updates(map[string]interface{}{"reservation_status": (*models.ReservationStatus)(&payload.ReservationStatus), "fo_status": (*models.FOStatus)(&fo_stat)}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	// Commit the transaction

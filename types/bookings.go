@@ -8,15 +8,16 @@ import (
 )
 
 type CreateBookingPayload struct {
-	CheckInDate   time.Time          `json:"check_in_date" validate:"required"`
-	CheckOutDate  time.Time          `json:"check_out_date" validate:"required"`
-	Duration      int                `json:"duration" validate:"required;min=1"`
-	GuestsNumber  int                `json:"guests_number" validate:"required;min=1"`
-	GuestRequest  string             `json:"guest_request"`
-	BookingExtras []string           `json:"extras" validate:"required"`
-	RoomID        uuid.UUID          `json:"room_id" validate:"required"`
-	Guest         CreateGuestPayload `json:"guest" validate:"required"`
-	Price         float64            `json:"price" validate:"required"`
+	CheckInDate       time.Time          `json:"check_in_date" validate:"required"`
+	CheckOutDate      time.Time          `json:"check_out_date" validate:"required"`
+	Duration          int                `json:"duration" validate:"required,min=1"`
+	GuestsNumber      int                `json:"guests_number" validate:"required,min=1"`
+	GuestRequest      string             `json:"guest_request"`
+	BookingExtras     []string           `json:"extras" validate:"required"`
+	RoomID            uuid.UUID          `json:"room_id" validate:"required"`
+	Guest             CreateGuestPayload `json:"guest" validate:"required"`
+	Price             float64            `json:"price" validate:"required"`
+	ReservationStatus string             `json:"res_status"`
 }
 
 type CreateGuestPayload struct {

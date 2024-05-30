@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import Loader from "@/components/Loader";
 import { SelectRoom } from "@/components/room-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,6 +30,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import useBookRooms from "../hooks/useBookRooms";
+import useCreateBooking from "../hooks/useCreateBooking";
 
 const formSchema = z.object({
   check_in_date: z.coerce.date({ message: "Check in date is required" }),
@@ -78,6 +80,7 @@ export default function BookingForm() {
 
   const [roomType, setRoomType] = useState("Standard");
   const [selectedRoom, setSelectedRoom] = useState<Room>();
+  const createBookingMutation = useCreateBooking();
 
   const bookRoomsQuery = useBookRooms({ room_type: roomType });
 
@@ -120,8 +123,15 @@ export default function BookingForm() {
     return extra;
   };
 
+  const [checkIn, setCheckIn] = useState(false);
+
   function onSubmit(values: BookingFormValues) {
-    console.log(values);
+    createBookingMutation.mutate({
+      values,
+      price: getTotalPrice(),
+      check_out_date: checkOutDate,
+      res_status: checkIn ? "In House" : "",
+    });
   }
 
   return (
@@ -418,11 +428,33 @@ export default function BookingForm() {
                 </span>
               </div>
             </div>
+            <div className="items-top flex space-x-2 mt-4 ">
+              <Checkbox
+                checked={checkIn}
+                onCheckedChange={(checked) =>
+                  setCheckIn(Boolean(checked.valueOf()))
+                }
+              />
+              <div className="grid gap-1.5 leading-none">
+                <Label
+                  htmlFor="terms1"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Check in
+                </Label>
+                <p className="text-sm text-muted-foreground">
+                  Check the guest in immediately on booking creation.
+                </p>
+              </div>
+            </div>
+
             <div className="mt-8 flex gap-x-3 items-center">
-              <Button variant="destructive" className="w-full">
-                Reserve Room
+              <Button
+                disabled={createBookingMutation.isPending}
+                className="w-full"
+              >
+                {createBookingMutation.isPending && <Loader />} Create booking
               </Button>
-              <Button className="w-full">Check in</Button>
             </div>
           </div>
         </div>
