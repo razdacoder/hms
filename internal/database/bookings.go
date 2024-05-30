@@ -94,3 +94,20 @@ func (s *service) UpdateBooking(id uuid.UUID, payload *types.UpdateBookingPayloa
 	result := s.db.Model(&models.Booking{}).Where("id = ?", id).Updates(_updates)
 	return result.Error
 }
+
+func (s *service) CheckInBooking(id uuid.UUID) error {
+	booking, err := s.GetBooking(id)
+	if err != nil {
+		return err
+	}
+
+	room, err := s.GetRoom(booking.RoomID)
+	if err != nil {
+		return err
+	}
+	resStat := "In House"
+	room.ReservationStatus = (*models.ReservationStatus)(&resStat)
+	result := s.db.Save(&room)
+
+	return result.Error
+}

@@ -47,6 +47,7 @@ type Service interface {
 	DeleteBooking(id uuid.UUID) error
 	CreateBooking(*types.CreateBookingPayload) error
 	UpdateBooking(uuid.UUID, *types.UpdateBookingPayload) error
+	CheckInBooking(uuid.UUID) error
 
 	// Guests
 	GetGuests() ([]models.Guest, error)

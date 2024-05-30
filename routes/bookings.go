@@ -34,6 +34,7 @@ func bookingsRouter(handler *BookingHandler) chi.Router {
 	router := chi.NewRouter()
 	router.Get("/", handler.handleGetBookings)
 	router.With(middlewares.IsLoggedIn, middlewares.IsLevel2).Post("/", handler.handleCreateBooking)
+	router.With(middlewares.IsLoggedIn, middlewares.IsLevel2).Post("/check-in/{id}", handler.handleCheckIn)
 	router.Route("/{id}", func(router chi.Router) {
 		router.Use(middlewares.IsLoggedIn)
 		router.Get("/", handler.handleGetBooking)
@@ -166,4 +167,23 @@ func (handler *BookingHandler) handleGetGuests(w http.ResponseWriter, r *http.Re
 		return
 	}
 	utils.Encode(w, http.StatusOK, guests)
+}
+
+func (handler *BookingHandler) handleCheckIn(w http.ResponseWriter, r *http.Request) {
+	param_id := chi.URLParam(r, "id")
+	id, err := uuid.Parse(param_id)
+
+	if err != nil {
+		utils.APIError(w, http.StatusBadRequest, fmt.Errorf("invalid id"))
+		return
+	}
+
+	err = handler.db.CheckInBooking(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utils.APIError(w, http.StatusNotFound, fmt.Errorf("booking not found"))
+		}
+	}
+
+	utils.Encode(w, http.StatusOK, map[string]string{"message": "Checked In"})
 }
