@@ -130,7 +130,7 @@ export default function BookingForm() {
       values,
       price: getTotalPrice(),
       check_out_date: checkOutDate,
-      res_status: checkIn ? "In House" : "",
+      booking_status: checkIn ? "In House" : "",
     });
   }
 

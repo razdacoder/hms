@@ -5,13 +5,13 @@ export const createBooking = async (
   values: BookingFormValues,
   price: number,
   check_out_date: Date,
-  res_status: string
+  booking_status: string
 ) => {
   const response = await api.post("/bookings", {
     ...values,
     price,
     check_out_date,
-    res_status,
+    booking_status,
   });
   if (response.status != 201) {
     throw new Error("Could not create booking");
@@ -49,6 +49,16 @@ export const checkOutBooking = async (id: string) => {
   const response = await api.post(`/bookings/check-out/${id}`);
   if (response.status != 200) {
     throw new Error("Failed to check out");
+  }
+  return response.data;
+};
+
+export const cancelBooking = async (id: string) => {
+  const response = await api.patch(`/bookings/${id}`, {
+    booking_status: "Cancelled",
+  });
+  if (response.status != 200) {
+    throw new Error("Failed to cancel booking");
   }
   return response.data;
 };

@@ -8,16 +8,16 @@ import (
 )
 
 type CreateBookingPayload struct {
-	CheckInDate       time.Time          `json:"check_in_date" validate:"required"`
-	CheckOutDate      time.Time          `json:"check_out_date" validate:"required"`
-	Duration          int                `json:"duration" validate:"required,min=1"`
-	GuestsNumber      int                `json:"guests_number" validate:"required,min=1"`
-	GuestRequest      string             `json:"guest_request"`
-	BookingExtras     []string           `json:"extras" validate:"required"`
-	RoomID            uuid.UUID          `json:"room_id" validate:"required"`
-	Guest             CreateGuestPayload `json:"guest" validate:"required"`
-	Price             float64            `json:"price" validate:"required"`
-	ReservationStatus string             `json:"res_status"`
+	CheckInDate   time.Time          `json:"check_in_date" validate:"required"`
+	CheckOutDate  time.Time          `json:"check_out_date" validate:"required"`
+	Duration      int                `json:"duration" validate:"required,min=1"`
+	GuestsNumber  int                `json:"guests_number" validate:"required,min=1"`
+	GuestRequest  string             `json:"guest_request"`
+	BookingExtras []string           `json:"extras" validate:"required"`
+	RoomID        uuid.UUID          `json:"room_id" validate:"required"`
+	Guest         CreateGuestPayload `json:"guest" validate:"required"`
+	Price         float64            `json:"price" validate:"required"`
+	BookingStatus string             `json:"booking_status"`
 }
 
 type CreateGuestPayload struct {
@@ -34,6 +34,7 @@ type UpdateBookingPayload struct {
 	BookingExtras []string  `json:"extras"`
 	RoomID        uuid.UUID `json:"room_id"`
 	Price         float64   `json:"price"`
+	BookingStatus string    `json:"booking_status"`
 }
 
 func ParseBookingUpdates(payload *UpdateBookingPayload) map[string]interface{} {
@@ -61,6 +62,10 @@ func ParseBookingUpdates(payload *UpdateBookingPayload) map[string]interface{} {
 
 	if payload.RoomID != uuid.Nil {
 		_updates["room_id"] = payload.RoomID
+	}
+
+	if payload.BookingStatus != "" {
+		_updates["booking_status"] = payload.BookingStatus
 	}
 
 	return _updates

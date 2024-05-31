@@ -5,14 +5,17 @@ import { DiscAlbum, LogInIcon, LogOut } from "lucide-react";
 import BookingActions from "./booking-actions";
 
 const getResStatus = (status: string) => {
-  if (status === "Not Reserved") {
+  if (status === "Reservation") {
     return <DiscAlbum className="size-4 text-slate-400" />;
   }
-  if (status === "Departed") {
+  if (status === "CheckedOut") {
     return <LogOut className="size-4 text-red-400" />;
   }
-  if (status === "In House") {
+  if (status === "CheckedIn") {
     return <LogInIcon className="size-4 text-blue-400" />;
+  }
+  if (status === "Cancelled") {
+    return <DiscAlbum className="size-4 text-red-400" />;
   }
 };
 
@@ -58,14 +61,14 @@ export const columns: ColumnDef<Booking>[] = [
     },
   },
   {
-    accessorKey: "room.res_status",
-    header: "Reservation Status",
+    accessorKey: "booking_status",
+    header: "Booking Status",
     cell: ({ row }) => {
-      const { room } = row.original;
+      const { booking_status } = row.original;
 
       return (
         <span className="flex items-center gap-x-2">
-          {getResStatus(room.res_status)} {room.res_status}
+          {getResStatus(booking_status)} {booking_status}
         </span>
       );
     },

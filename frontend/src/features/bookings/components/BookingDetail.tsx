@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { Check, ChevronLeft, Plus, Printer } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import useBooking from "../hooks/useBooking";
+import useCancelBooking from "../hooks/useCancelBooking";
 import useCheckIn from "../hooks/useCheckIn";
 import useCheckOut from "../hooks/useCheckOut";
 
@@ -16,6 +17,7 @@ export default function BookingDetail() {
   const { booking, bookingLoading } = useBooking({ id: id! });
   const checkInMutation = useCheckIn({ id: id! });
   const checkOutMutation = useCheckOut({ id: id! });
+  const cancelBookingMutation = useCancelBooking({ id: id! });
 
   if (bookingLoading) {
     return (
@@ -25,7 +27,10 @@ export default function BookingDetail() {
     );
   }
 
-  const disabled = checkInMutation.isPending || checkOutMutation.isPending;
+  const disabled =
+    checkInMutation.isPending ||
+    checkOutMutation.isPending ||
+    cancelBookingMutation.isPending;
   return (
     <main className="px-6">
       <div className="flex justify-between items-center">
@@ -60,11 +65,7 @@ export default function BookingDetail() {
                 <h3 className="text-xl font-medium">
                   {booking?.guest.full_name}
                 </h3>
-                <Badge>
-                  {booking?.room.res_status === "In House"
-                    ? "In House"
-                    : "Reservation"}
-                </Badge>
+                <Badge>{booking?.booking_status}</Badge>
               </div>
 
               <Button variant="ghost" size="icon">
@@ -161,35 +162,50 @@ export default function BookingDetail() {
         </div>
         <Separator className="my-6" />
         <div className="bg-white p-6">
-          <div className="flex justify-between items-center">
-            <Button disabled={disabled} variant="destructive">
-              Cancel Booking
-            </Button>
-            <div className="flex items-center gap-x-2">
-              <Button disabled={disabled} variant="secondary">
-                Delete Booking
+          {booking?.booking_status != "Cancelled" ? (
+            <div className="flex justify-between items-center">
+              <Button
+                disabled={disabled || booking?.booking_status != "Reservation"}
+                className="flex gap-x-2 items-center"
+                variant="destructive"
+                onClick={() => cancelBookingMutation.mutate()}
+              >
+                {cancelBookingMutation.isPending && <Loader />}
+                Cancel Booking
               </Button>
-              {booking?.room.res_status == "In House" ? (
-                <Button
-                  className="flex gap-x-2 items-center"
-                  disabled={disabled}
-                  onClick={() => checkOutMutation.mutate()}
-                >
-                  {checkOutMutation.isPending && <Loader />}
-                  Check Out Booking
+              <div className="flex items-center gap-x-2">
+                <Button disabled={disabled} variant="secondary">
+                  Delete Booking
                 </Button>
-              ) : (
-                <Button
-                  className="flex gap-x-2 items-center"
-                  disabled={disabled}
-                  onClick={() => checkInMutation.mutate()}
-                >
-                  {checkInMutation.isPending && <Loader />}
-                  Check In Booking
-                </Button>
-              )}
+                {booking?.booking_status == "CheckedIn" && (
+                  <Button
+                    className="flex gap-x-2 items-center"
+                    disabled={disabled}
+                    onClick={() => checkOutMutation.mutate()}
+                  >
+                    {checkOutMutation.isPending && <Loader />}
+                    Check Out Booking
+                  </Button>
+                )}
+                {booking?.booking_status === "Reservation" && (
+                  <Button
+                    className="flex gap-x-2 items-center"
+                    disabled={disabled}
+                    onClick={() => checkInMutation.mutate()}
+                  >
+                    {checkInMutation.isPending && <Loader />}
+                    Check In Booking
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex justify-center items-center">
+              <p className="text-red-500 font-medium text-lg">
+                This booking has been cancelled
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </main>

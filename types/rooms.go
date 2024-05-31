@@ -17,17 +17,16 @@ type CreateRoomPayload struct {
 }
 
 type UpdateRoomPayload struct {
-	RoomType          string   `json:"room_type"`
-	RoomNumber        string   `json:"room_number"`
-	Price             float64  `json:"price" `
-	RoomStatus        string   `json:"room_status"`
-	ReturnStatus      string   `json:"return_status"`
-	ReservationStatus string   `json:"res_status"`
-	FOStatus          string   `json:"fo_status"`
-	BedType           string   `json:"bed_type"`
-	MaxCapacity       int      `json:"max_capacity"`
-	Amenities         []string `json:"amenities"`
-	Images            []string `json:"images"`
+	RoomType     string   `json:"room_type"`
+	RoomNumber   string   `json:"room_number"`
+	Price        float64  `json:"price" `
+	RoomStatus   string   `json:"room_status"`
+	ReturnStatus string   `json:"return_status"`
+	FOStatus     string   `json:"fo_status"`
+	BedType      string   `json:"bed_type"`
+	MaxCapacity  int      `json:"max_capacity"`
+	Amenities    []string `json:"amenities"`
+	Images       []string `json:"images"`
 }
 
 func ParseRoomUpdates(payload *UpdateRoomPayload) map[string]interface{} {
@@ -47,10 +46,6 @@ func ParseRoomUpdates(payload *UpdateRoomPayload) map[string]interface{} {
 
 	if payload.ReturnStatus != "" {
 		_updates["return_status"] = payload.ReturnStatus
-	}
-
-	if payload.ReservationStatus != "" {
-		_updates["reservation_status"] = (*models.ReservationStatus)(&payload.ReservationStatus)
 	}
 
 	if payload.BedType != "" {

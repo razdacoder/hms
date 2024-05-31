@@ -47,6 +47,7 @@ func (s *service) CreateBooking(payload *types.CreateBookingPayload) error {
 			return err
 		}
 	}
+
 	// Create the booking
 	booking := &models.Booking{
 		CheckInDate:   payload.CheckInDate,
@@ -60,17 +61,18 @@ func (s *service) CreateBooking(payload *types.CreateBookingPayload) error {
 		Price:         payload.Price,
 	}
 
+	if payload.BookingStatus != "" {
+		booking.BookingStatus = (*models.BookingStatus)(&payload.BookingStatus)
+	}
+
 	fo_stat := "Occupied"
 
 	if err := tx.Create(booking).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
-
-	if payload.ReservationStatus != "" {
-		// booking.Room.ReservationStatus = (*models.ReservationStatus)(&payload.ReservationStatus)
-		// booking.Room.FOStatus = (*models.FOStatus)(&fo_stat)
-		if err := tx.Model(&models.Room{}).Where("id", booking.RoomID).Updates(map[string]interface{}{"reservation_status": (*models.ReservationStatus)(&payload.ReservationStatus), "fo_status": (*models.FOStatus)(&fo_stat)}).Error; err != nil {
+	if payload.BookingStatus != "" {
+		if err := tx.Model(&models.Room{}).Where("id", booking.RoomID).Updates(map[string]interface{}{"fo_status": (*models.FOStatus)(&fo_stat)}).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -105,10 +107,15 @@ func (s *service) CheckInBooking(id uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	resStat := "In House"
+
 	foStat := "Occupied"
-	room.ReservationStatus = (*models.ReservationStatus)(&resStat)
+	booking_stat := "CheckedIn"
 	room.FOStatus = (*models.FOStatus)(&foStat)
+	booking.BookingStatus = (*models.BookingStatus)(&booking_stat)
+
+	if err := s.db.Save(&booking).Error; err != nil {
+		return err
+	}
 	result := s.db.Save(&room)
 
 	return result.Error
@@ -123,19 +130,22 @@ func (s *service) CheckOut(id uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	resStat := "Not Reserved"
 	foStat := "Vacant"
 	roomStat := "Clean up"
-	room.ReservationStatus = (*models.ReservationStatus)(&resStat)
+	booking_stat := "CheckedOut"
 	room.FOStatus = (*models.FOStatus)(&foStat)
 	room.RoomStatus = (*models.RoomStatus)(&roomStat)
+	booking.BookingStatus = (*models.BookingStatus)(&booking_stat)
 
+	if err := s.db.Save(&booking).Error; err != nil {
+		return err
+	}
 	result := s.db.Save(&room)
 	return result.Error
 }
 
 func (s *service) GetActiveBookings() ([]models.Booking, error) {
 	var bookings []models.Booking
-	result := s.db.Model(&models.Booking{}).Joins("JOIN rooms ON room_id = rooms.id").Where("rooms.fo_status = ? AND rooms.reservation_status = ?", "Occupied", "In House").Preload("Room").Find(&bookings)
+	result := s.db.Model(&models.Booking{}).Where("booking_status = ?", "CheckedIn").Preload("Room").Find(&bookings)
 	return bookings, result.Error
 }

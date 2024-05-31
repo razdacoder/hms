@@ -55,28 +55,6 @@ func (e RoomType) Value() (interface{}, error) {
 	return string(e), nil
 }
 
-type ReservationStatus string
-
-const (
-	NotReserved ReservationStatus = "Not Reserved"
-	Departed    ReservationStatus = "Departed"
-	InHouse     ReservationStatus = "In House"
-)
-
-func (e *ReservationStatus) Scan(value interface{}) error {
-	val, ok := value.(string)
-	if !ok {
-		return fmt.Errorf("invalid str")
-	}
-	*e = ReservationStatus(val)
-
-	return nil
-}
-
-func (e ReservationStatus) Value() (interface{}, error) {
-	return string(e), nil
-}
-
 type FOStatus string
 
 const (
@@ -121,19 +99,18 @@ func (e BedType) Value() (interface{}, error) {
 }
 
 type Room struct {
-	ID                uuid.UUID          `gorm:"primary_key;type:uuid;default:uuid_generate_v4()" json:"id"`
-	RoomType          *RoomType          `gorm:"type:room_type;default:Standard;not null" json:"room_type"`
-	RoomNumber        string             `gorm:"type:text;not null" json:"room_number"`
-	Price             float64            `gorm:"type:decimal(10, 2);not null" json:"price"`
-	RoomStatus        *RoomStatus        `gorm:"type:room_status;default:Clean;not null" json:"room_status"`
-	ReturnStatus      string             `gorm:"type:text" json:"return_status"`
-	ReservationStatus *ReservationStatus `gorm:"type:res_status;default:Not Reserved;not null" json:"res_status"`
-	FOStatus          *FOStatus          `gorm:"type:fo_status;default:Vacant;not null" json:"fo_status"`
-	BedType           *BedType           `gorm:"type:bed_type;default:Twin Size;not null" json:"bed_type"`
-	MaxCapacity       int                `gorm:"type:int;not null" json:"max_capacity"`
-	Amenities         pq.StringArray     `gorm:"type:text[];not null" json:"amenities"`
-	Images            pq.StringArray     `gorm:"type:text[];not null" json:"images"`
-	Bookings          []Booking          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"bookings,omitempty"`
-	CreatedAt         time.Time          `gorm:"auto_now_add" json:"created_at"`
-	UpdatedAt         time.Time          `gorm:"auto_now" json:"updated_at"`
+	ID           uuid.UUID      `gorm:"primary_key;type:uuid;default:uuid_generate_v4()" json:"id"`
+	RoomType     *RoomType      `gorm:"type:room_type;default:Standard;not null" json:"room_type"`
+	RoomNumber   string         `gorm:"type:text;not null" json:"room_number"`
+	Price        float64        `gorm:"type:decimal(10, 2);not null" json:"price"`
+	RoomStatus   *RoomStatus    `gorm:"type:room_status;default:Clean;not null" json:"room_status"`
+	ReturnStatus string         `gorm:"type:text" json:"return_status"`
+	FOStatus     *FOStatus      `gorm:"type:fo_status;default:Vacant;not null" json:"fo_status"`
+	BedType      *BedType       `gorm:"type:bed_type;default:Twin Size;not null" json:"bed_type"`
+	MaxCapacity  int            `gorm:"type:int;not null" json:"max_capacity"`
+	Amenities    pq.StringArray `gorm:"type:text[];not null" json:"amenities"`
+	Images       pq.StringArray `gorm:"type:text[];not null" json:"images"`
+	Bookings     []Booking      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"bookings,omitempty"`
+	CreatedAt    time.Time      `gorm:"auto_now_add" json:"created_at"`
+	UpdatedAt    time.Time      `gorm:"auto_now" json:"updated_at"`
 }

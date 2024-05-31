@@ -6,7 +6,6 @@ import {
   LogOut,
   LucideIcon,
   Settings,
-  User,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -49,11 +48,7 @@ const routes: SidebarLink[] = [
     href: "/rooms",
     icon: BedDouble,
   },
-  {
-    title: "Guest",
-    href: "/guests",
-    icon: User,
-  },
+
   {
     title: "Booking",
     href: "/bookings",

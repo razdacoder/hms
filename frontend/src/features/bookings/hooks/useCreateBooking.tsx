@@ -13,13 +13,13 @@ export default function useCreateBooking() {
       values: BookingFormValues;
       price: number;
       check_out_date: Date;
-      res_status: string;
+      booking_status: string;
     }) =>
       createBooking(
         data.values,
         data.price,
         data.check_out_date,
-        data.res_status
+        data.booking_status
       ),
     onSuccess: () => {
       navigate("/bookings");

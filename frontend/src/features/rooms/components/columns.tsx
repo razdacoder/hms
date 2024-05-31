@@ -2,9 +2,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { formatPrice } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import {
-  DiscAlbum,
-  LogInIcon,
-  LogOut,
   Minus,
   Paintbrush,
   ShieldBan,
@@ -29,18 +26,6 @@ const getRoomStatus = (status: string) => {
   }
   if (status === "Dirty") {
     return <Paintbrush className="size-4 text-red-400" />;
-  }
-};
-
-const getResStatus = (status: string) => {
-  if (status === "Not Reserved") {
-    return <DiscAlbum className="size-4 text-slate-400" />;
-  }
-  if (status === "Departed") {
-    return <LogOut className="size-4 text-red-400" />;
-  }
-  if (status === "In House") {
-    return <LogInIcon className="size-4 text-blue-400" />;
   }
 };
 
@@ -105,19 +90,7 @@ export const columns: ColumnDef<Room>[] = [
     accessorKey: "fo_status",
     header: "FO Status",
   },
-  {
-    accessorKey: "res_status",
-    header: "Reservation Status",
-    cell: ({ row }) => {
-      const { res_status } = row.original;
 
-      return (
-        <span className="flex items-center gap-x-2">
-          {getResStatus(res_status)} {res_status}
-        </span>
-      );
-    },
-  },
   {
     accessorKey: "price",
     header: "Room Price",

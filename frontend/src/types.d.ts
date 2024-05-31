@@ -34,6 +34,7 @@ type Booking = {
   room: Room;
   guest: Guest;
   price: number;
+  booking_status: string;
   created_at: Date;
   updated_at: Date;
 };
