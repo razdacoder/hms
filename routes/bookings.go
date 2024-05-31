@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hms-api/internal/database"
 	"hms-api/middlewares"
+	"hms-api/models"
 	"hms-api/types"
 	"hms-api/utils"
 	"net/http"
@@ -35,6 +36,7 @@ func bookingsRouter(handler *BookingHandler) chi.Router {
 	router.Get("/", handler.handleGetBookings)
 	router.With(middlewares.IsLoggedIn, middlewares.IsLevel2).Post("/", handler.handleCreateBooking)
 	router.With(middlewares.IsLoggedIn, middlewares.IsLevel2).Post("/check-in/{id}", handler.handleCheckIn)
+	router.With(middlewares.IsLoggedIn, middlewares.IsLevel2).Post("/check-out/{id}", handler.handleCheckOut)
 	router.Route("/{id}", func(router chi.Router) {
 		router.Use(middlewares.IsLoggedIn)
 		router.Get("/", handler.handleGetBooking)
@@ -51,12 +53,24 @@ func (handler *BookingHandler) RegisterUserRoutes(router chi.Router) {
 }
 
 func (handler *BookingHandler) handleGetBookings(w http.ResponseWriter, r *http.Request) {
-	bookings, err := handler.db.GetBookings()
+	query := r.URL.Query().Get("query")
+	var bookings []models.Booking
+	var err error
+
+	switch query {
+	case "active":
+		bookings, err = handler.db.GetActiveBookings()
+	default:
+		bookings, err = handler.db.GetBookings()
+	}
+
 	if err != nil {
 		utils.ServerError(w, r, err)
 		return
 	}
+
 	utils.Encode(w, http.StatusOK, bookings)
+
 }
 
 func (handler *BookingHandler) handleGetBooking(w http.ResponseWriter, r *http.Request) {
@@ -189,4 +203,26 @@ func (handler *BookingHandler) handleCheckIn(w http.ResponseWriter, r *http.Requ
 	}
 
 	utils.Encode(w, http.StatusOK, map[string]string{"message": "Checked In"})
+}
+
+func (handler *BookingHandler) handleCheckOut(w http.ResponseWriter, r *http.Request) {
+	param_id := chi.URLParam(r, "id")
+	id, err := uuid.Parse(param_id)
+
+	if err != nil {
+		utils.APIError(w, http.StatusBadRequest, fmt.Errorf("invalid id"))
+		return
+	}
+
+	err = handler.db.CheckOut(id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utils.APIError(w, http.StatusNotFound, fmt.Errorf("booking not found"))
+			return
+		}
+		utils.ServerError(w, r, err)
+		return
+	}
+
+	utils.Encode(w, http.StatusOK, map[string]string{"message": "Checked Out"})
 }

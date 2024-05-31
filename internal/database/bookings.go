@@ -106,8 +106,36 @@ func (s *service) CheckInBooking(id uuid.UUID) error {
 		return err
 	}
 	resStat := "In House"
+	foStat := "Occupied"
 	room.ReservationStatus = (*models.ReservationStatus)(&resStat)
+	room.FOStatus = (*models.FOStatus)(&foStat)
 	result := s.db.Save(&room)
 
 	return result.Error
+}
+
+func (s *service) CheckOut(id uuid.UUID) error {
+	booking, err := s.GetBooking(id)
+	if err != nil {
+		return err
+	}
+	room, err := s.GetRoom(booking.RoomID)
+	if err != nil {
+		return err
+	}
+	resStat := "Not Reserved"
+	foStat := "Vacant"
+	roomStat := "Clean up"
+	room.ReservationStatus = (*models.ReservationStatus)(&resStat)
+	room.FOStatus = (*models.FOStatus)(&foStat)
+	room.RoomStatus = (*models.RoomStatus)(&roomStat)
+
+	result := s.db.Save(&room)
+	return result.Error
+}
+
+func (s *service) GetActiveBookings() ([]models.Booking, error) {
+	var bookings []models.Booking
+	result := s.db.Model(&models.Booking{}).Joins("JOIN rooms ON room_id = rooms.id").Where("rooms.fo_status = ? AND rooms.reservation_status = ?", "Occupied", "In House").Preload("Room").Find(&bookings)
+	return bookings, result.Error
 }
