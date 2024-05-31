@@ -36,3 +36,11 @@ export const getBooking = async (id: string) => {
   }
   return response.data as Booking;
 };
+
+export const checkInBooking = async (id: string) => {
+  const response = await api.post(`/bookings/check-in/${id}`);
+  if (response.status != 200) {
+    throw new Error("Failed to check in");
+  }
+  return response.data;
+};

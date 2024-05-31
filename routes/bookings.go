@@ -182,7 +182,10 @@ func (handler *BookingHandler) handleCheckIn(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			utils.APIError(w, http.StatusNotFound, fmt.Errorf("booking not found"))
+			return
 		}
+		utils.ServerError(w, r, err)
+		return
 	}
 
 	utils.Encode(w, http.StatusOK, map[string]string{"message": "Checked In"})

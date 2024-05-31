@@ -8,10 +8,12 @@ import { format } from "date-fns";
 import { Check, ChevronLeft, Plus, Printer } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import useBooking from "../hooks/useBooking";
+import useCheckIn from "../hooks/useCheckIn";
 
 export default function BookingDetail() {
   const { id } = useParams();
   const { booking, bookingLoading } = useBooking({ id: id! });
+  const checkInMutation = useCheckIn({ id: id! });
 
   if (bookingLoading) {
     return (
@@ -20,6 +22,8 @@ export default function BookingDetail() {
       </div>
     );
   }
+
+  const disabled = checkInMutation.isPending;
   return (
     <main className="px-6">
       <div className="flex justify-between items-center">
@@ -156,13 +160,24 @@ export default function BookingDetail() {
         <Separator className="my-6" />
         <div className="bg-white p-6">
           <div className="flex justify-between items-center">
-            <Button variant="destructive">Cancel Booking</Button>
+            <Button disabled={disabled} variant="destructive">
+              Cancel Booking
+            </Button>
             <div className="flex items-center gap-x-2">
-              <Button variant="secondary">Delete Booking</Button>
+              <Button disabled={disabled} variant="secondary">
+                Delete Booking
+              </Button>
               {booking?.room.res_status == "In House" ? (
                 <Button>Check Out Booking</Button>
               ) : (
-                <Button>Check In Booking</Button>
+                <Button
+                  className="flex gap-x-2 items-center"
+                  disabled={disabled}
+                  onClick={() => checkInMutation.mutate()}
+                >
+                  {checkInMutation.isPending && <Loader />}
+                  Check In Booking
+                </Button>
               )}
             </div>
           </div>
