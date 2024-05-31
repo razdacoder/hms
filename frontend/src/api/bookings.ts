@@ -44,3 +44,11 @@ export const checkInBooking = async (id: string) => {
   }
   return response.data;
 };
+
+export const checkOutBooking = async (id: string) => {
+  const response = await api.post(`/bookings/check-out/${id}`);
+  if (response.status != 200) {
+    throw new Error("Failed to check out");
+  }
+  return response.data;
+};

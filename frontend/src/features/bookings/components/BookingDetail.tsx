@@ -9,11 +9,13 @@ import { Check, ChevronLeft, Plus, Printer } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import useBooking from "../hooks/useBooking";
 import useCheckIn from "../hooks/useCheckIn";
+import useCheckOut from "../hooks/useCheckOut";
 
 export default function BookingDetail() {
   const { id } = useParams();
   const { booking, bookingLoading } = useBooking({ id: id! });
   const checkInMutation = useCheckIn({ id: id! });
+  const checkOutMutation = useCheckOut({ id: id! });
 
   if (bookingLoading) {
     return (
@@ -23,7 +25,7 @@ export default function BookingDetail() {
     );
   }
 
-  const disabled = checkInMutation.isPending;
+  const disabled = checkInMutation.isPending || checkOutMutation.isPending;
   return (
     <main className="px-6">
       <div className="flex justify-between items-center">
@@ -168,7 +170,14 @@ export default function BookingDetail() {
                 Delete Booking
               </Button>
               {booking?.room.res_status == "In House" ? (
-                <Button>Check Out Booking</Button>
+                <Button
+                  className="flex gap-x-2 items-center"
+                  disabled={disabled}
+                  onClick={() => checkOutMutation.mutate()}
+                >
+                  {checkOutMutation.isPending && <Loader />}
+                  Check Out Booking
+                </Button>
               ) : (
                 <Button
                   className="flex gap-x-2 items-center"
