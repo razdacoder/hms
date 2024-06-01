@@ -62,3 +62,11 @@ export const cancelBooking = async (id: string) => {
   }
   return response.data;
 };
+
+export const deleteBooking = async (id: string) => {
+  const response = await api.delete(`/bookings/${id}`);
+  if (response.status != 200) {
+    throw new Error("Failed to delete booking");
+  }
+  return response.data;
+};

@@ -8,16 +8,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useConfirm } from "@/hooks/useConfirm";
-import { Edit, Eye, MoreVertical, Trash2 } from "lucide-react";
+import { Eye, MoreVertical, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import useDeleteBooking from "../hooks/useDeleteBooking";
 
 type Props = {
   booking: Booking;
 };
 
 export default function BookingActions({ booking }: Props) {
-  //   const [isOpen, setIsOpen] = useState(false);
-  //   const deleteRoomMutation = useDeleteRoom();
+  const bookingDeleteMutation = useDeleteBooking();
   const [ConfirmationDialog, confirm] = useConfirm(
     "Are you sure?",
     "This will delete this room from the database."
@@ -45,16 +45,15 @@ export default function BookingActions({ booking }: Props) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem className="flex gap-x-2 items-center cursor-pointer">
-            <Edit className="size-4" /> Edit booking
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator />
           <DropdownMenuItem
+            disabled={
+              bookingDeleteMutation.isPending ||
+              booking.booking_status === "Cancelled"
+            }
             onClick={async () => {
               const ok = await confirm();
               if (ok) {
-                //   deleteRoomMutation.mutate({ id: room.id });
+                bookingDeleteMutation.mutate(booking.id);
               }
             }}
             className="flex gap-x-2 items-center cursor-pointer"

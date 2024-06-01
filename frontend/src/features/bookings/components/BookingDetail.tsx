@@ -3,21 +3,29 @@ import Loader from "@/components/Loader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useConfirm } from "@/hooks/useConfirm";
 import { formatPrice } from "@/lib/utils";
 import { format } from "date-fns";
 import { Check, ChevronLeft, Plus, Printer } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import useBooking from "../hooks/useBooking";
 import useCancelBooking from "../hooks/useCancelBooking";
 import useCheckIn from "../hooks/useCheckIn";
 import useCheckOut from "../hooks/useCheckOut";
+import useDeleteBooking from "../hooks/useDeleteBooking";
 
 export default function BookingDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { booking, bookingLoading } = useBooking({ id: id! });
   const checkInMutation = useCheckIn({ id: id! });
   const checkOutMutation = useCheckOut({ id: id! });
   const cancelBookingMutation = useCancelBooking({ id: id! });
+  const bookingDeleteMutation = useDeleteBooking();
+  const [ConfirmationDialog, confirm] = useConfirm(
+    "Are you sure?",
+    "This will delete this room from the database."
+  );
 
   if (bookingLoading) {
     return (
@@ -33,6 +41,7 @@ export default function BookingDetail() {
     cancelBookingMutation.isPending;
   return (
     <main className="px-6">
+      <ConfirmationDialog />
       <div className="flex justify-between items-center">
         <div>
           <h3 className="font-medium text-muted-foreground">Booking Detail</h3>
@@ -65,7 +74,22 @@ export default function BookingDetail() {
                 <h3 className="text-xl font-medium">
                   {booking?.guest.full_name}
                 </h3>
-                <Badge>{booking?.booking_status}</Badge>
+                {booking?.booking_status === "CheckedIn" && (
+                  <Badge className="bg-blue-500 hover:bg-blue-500">
+                    Checked In
+                  </Badge>
+                )}
+                {booking?.booking_status === "CheckedOut" && (
+                  <Badge className="bg-orange-500 hover:bg-orange-500">
+                    Checked Out
+                  </Badge>
+                )}
+                {booking?.booking_status === "Reservation" && (
+                  <Badge>Reservation</Badge>
+                )}
+                {booking?.booking_status === "Cancelled" && (
+                  <Badge variant="destructive">Cancelled</Badge>
+                )}
               </div>
 
               <Button variant="ghost" size="icon">
@@ -174,7 +198,20 @@ export default function BookingDetail() {
                 Cancel Booking
               </Button>
               <div className="flex items-center gap-x-2">
-                <Button disabled={disabled} variant="secondary">
+                <Button
+                  onClick={async () => {
+                    const ok = await confirm();
+                    if (ok) {
+                      bookingDeleteMutation.mutate(id!, {
+                        onSuccess: () => {
+                          navigate("/bookings");
+                        },
+                      });
+                    }
+                  }}
+                  disabled={disabled}
+                  variant="secondary"
+                >
                   Delete Booking
                 </Button>
                 {booking?.booking_status == "CheckedIn" && (

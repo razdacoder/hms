@@ -1,4 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
 import { formatPrice } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -30,28 +29,6 @@ const getRoomStatus = (status: string) => {
 };
 
 export const columns: ColumnDef<Room>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "room_type",
     header: "Room",
@@ -89,6 +66,18 @@ export const columns: ColumnDef<Room>[] = [
   {
     accessorKey: "fo_status",
     header: "FO Status",
+  },
+  {
+    accessorKey: "bed_type",
+    header: "Bed Type",
+  },
+  {
+    accessorKey: "max_capacity",
+    header: "Max Guests",
+    cell: ({ row }) => {
+      const { max_capacity } = row.original;
+      return <span>{max_capacity} Guests</span>;
+    },
   },
 
   {
