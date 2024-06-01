@@ -3,12 +3,14 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"hms-api/middlewares"
 	"hms-api/routes"
 	"hms-api/utils"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"log"
 	"net/http"
@@ -40,6 +42,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	v1Router := chi.NewRouter()
 	r.Mount("/api/v1", v1Router)
+	v1Router.With(middlewares.IsLoggedIn, middlewares.IsLevel2).Get("/stats", s.getStats)
 	v1Router.Post("/upload", s.uploadHandler)
 	v1Router.Delete("/delete-file", s.deleteHandler)
 	userHandler := routes.NewUserHandler(s.db)
@@ -114,6 +117,26 @@ func (s *Server) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.Encode(w, http.StatusOK, map[string]string{"message": "Image Deleted"})
+}
+
+func (s *Server) getStats(w http.ResponseWriter, r *http.Request) {
+	dateStr := r.URL.Query().Get("date")
+	var date time.Time
+	if dateStr != "" {
+		dateParsed, err := time.Parse("2006-01-02", dateStr)
+
+		if err != nil {
+			utils.ServerError(w, r, err)
+			return
+		}
+		date = dateParsed
+	}
+	stats, err := s.db.GetStats(date)
+	if err != nil {
+		utils.ServerError(w, r, err)
+		return
+	}
+	utils.Encode(w, http.StatusOK, stats)
 }
 
 func FileServer(r chi.Router, path string, root http.FileSystem) {

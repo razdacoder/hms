@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hms-api/models"
 	"hms-api/types"
+	"hms-api/utils"
 	"log"
 	"os"
 	"strconv"
@@ -23,6 +24,7 @@ type Service interface {
 	// System
 	Health() map[string]string
 	Close() error
+	GetStats(time.Time) (map[string]interface{}, error)
 
 	// User
 	CreateUser(*types.CreateUserPayload) error
@@ -143,6 +145,89 @@ func (s *service) Health() map[string]string {
 	}
 
 	return stats
+}
+
+func (s *service) GetStats(day time.Time) (map[string]interface{}, error) {
+	stats := make(map[string]interface{})
+	var bookingsCount int64
+	var availableRooms int64
+	var inBookings []models.Booking
+	var outBookings []models.Booking
+	var resBookings []models.Booking
+	var cancelBookings []models.Booking
+	var cleanRooms int64
+	var outServiceRooms int64
+	var dirtyRooms int64
+
+	if day.IsZero() {
+		day = time.Now()
+	}
+	fmt.Println(day)
+	result := s.db.Model(&models.Booking{}).Where("DATE(created_at) = ?", day.Format("2006-01-02")).Count(&bookingsCount)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	result = s.db.Model(&models.Room{}).Where("room_status = ?", "Clean").Where("fo_status = ?", "Vacant").Where("return_status = ?", "Ready").Count(&availableRooms)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	result = s.db.Model(&models.Booking{}).Where("DATE(created_at) = ?", day.Format("2006-01-02")).Where("booking_status = ?", "CheckedIn").Find(&inBookings)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	result = s.db.Model(&models.Booking{}).Where("DATE(created_at) = ?", day.Format("2006-01-02")).Where("booking_status = ?", "CheckedOut").Find(&outBookings)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	result = s.db.Model(&models.Booking{}).Where("DATE(created_at) = ?", day.Format("2006-01-02")).Where("booking_status = ?", "Reservation").Find(&resBookings)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	result = s.db.Model(&models.Booking{}).Where("DATE(created_at) = ?", day.Format("2006-01-02")).Where("booking_status = ?", "Cancelled").Find(&cancelBookings)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	chartData := utils.MakeBookingData(inBookings, outBookings, resBookings, cancelBookings)
+
+	result = s.db.Model(&models.Room{}).Where("room_status = ?", "Clean").Count(&cleanRooms)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	result = s.db.Model(&models.Room{}).Where("room_status = ?", "Out of service").Count(&outServiceRooms)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	result = s.db.Model(&models.Room{}).Where("room_status = ?", "Dirty").Count(&dirtyRooms)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	stats["new_bookings"] = bookingsCount
+	stats["available_rooms"] = availableRooms
+	stats["check_ins"] = len(inBookings)
+	stats["check_outs"] = len(outBookings)
+	stats["reservations"] = len(resBookings)
+	stats["cancelled"] = len(cancelBookings)
+	stats["data"] = chartData
+	stats["pieData"] = []map[string]interface{}{
+		{
+			"name":  "Clean Rooms",
+			"value": cleanRooms,
+		},
+		{
+			"name":  "Out of Service Rooms",
+			"value": outServiceRooms,
+		},
+		{
+			"name":  "Dirty Rooms",
+			"value": dirtyRooms,
+		},
+	}
+
+	return stats, nil
+
 }
 
 // Close closes the database connection.

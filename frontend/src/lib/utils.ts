@@ -13,3 +13,11 @@ export function formatPrice(value: number) {
   });
   return formatter.format(value);
 }
+
+export function formatPercentage(value: number) {
+  const result = new Intl.NumberFormat("en-US", {
+    style: "percent",
+  }).format(value / 100);
+
+  return result;
+}

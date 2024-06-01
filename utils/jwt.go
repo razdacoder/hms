@@ -57,7 +57,6 @@ func VerifyToken(tokenString string) (*UserPayload, error) {
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
-	fmt.Println(claims)
 	userClaims, ok := claims["user"].(map[string]interface{})
 	if !ok {
 		return nil, fmt.Errorf("user claim not found")

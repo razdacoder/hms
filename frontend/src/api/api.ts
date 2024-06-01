@@ -36,3 +36,11 @@ export const deleteImage = async (url: string) => {
 
   return response.data;
 };
+
+export const getStats = async (date?: string) => {
+  const response = await api.get(`/stats?date=${date ? date : ""}`);
+  if (response.status != 200) {
+    throw new Error("Failed to get stats");
+  }
+  return response.data as Stats;
+};

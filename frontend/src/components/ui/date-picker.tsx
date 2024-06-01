@@ -20,7 +20,7 @@ export const DatePicker = ({ value, onChange, disabled }: Props) => {
           disabled={disabled}
           variant="outline"
           className={cn(
-            "w-full justify-start font-normal",
+            "w-full justify-start text-left font-normal",
             !value && "text-muted-foreground"
           )}
         >

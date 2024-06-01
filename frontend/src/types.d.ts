@@ -38,3 +38,27 @@ type Booking = {
   created_at: Date;
   updated_at: Date;
 };
+
+type Stats = {
+  available_rooms: number;
+  check_ins: number;
+  check_outs: number;
+  new_bookings: number;
+  reservations: number;
+  cancelled: number;
+  data: ChartData[];
+  pieData: PieData[];
+};
+
+type ChartData = {
+  cancelled: number;
+  check_in: number;
+  check_out: number;
+  hour: string;
+  reservation: number;
+};
+
+type PieData = {
+  name: string;
+  value: number;
+};
