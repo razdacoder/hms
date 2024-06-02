@@ -1,8 +1,10 @@
+import useUser from "@/hooks/useUser";
 import { Search } from "lucide-react";
 import Logo from "./Logo";
 import { Input } from "./ui/input";
 
 export default function Navbar() {
+  const { user } = useUser();
   return (
     <header className="grid w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] h-[70px] pr-8 bg-white">
       <div className="pl-8 my-auto">
@@ -23,8 +25,12 @@ export default function Navbar() {
         </div>
         <div>
           <div className="">
-            <h6 className="text-sm font-medium">Ramon Rasheed</h6>
-            <p className="text-xs font-light">Manager</p>
+            <h6 className="text-sm font-medium">
+              {user.user.first_name} {user.user.last_name}
+            </h6>
+            <p className="text-xs font-light">
+              Security Level: {user.user.security_level}
+            </p>
           </div>
         </div>
       </div>

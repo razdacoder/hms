@@ -76,3 +76,9 @@ func (s *service) ChangePassword(id uuid.UUID, password string) error {
 	result := s.db.Model(&models.User{}).Where("id = ?", id).Update("password", password)
 	return result.Error
 }
+
+func (s *service) GetUsers() ([]models.User, error) {
+	var users []models.User
+	result := s.db.Model(&models.User{}).Order("created_at DESC").Find(&users)
+	return users, result.Error
+}

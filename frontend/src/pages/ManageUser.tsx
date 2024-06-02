@@ -1,63 +1,24 @@
 import { DataTable } from "@/components/DataTable";
 import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { columns } from "@/features/bookings/components/columns";
-import useBookings from "@/features/bookings/hooks/useBookings";
+import { columns } from "@/features/auth/components/columns";
+import { useNewUser } from "@/features/auth/hooks/useCreateDialog";
+import useGetUsers from "@/features/auth/hooks/useGetUsers";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
-export default function Booking() {
+export default function ManageUsers() {
   const [filter, setFilter] = useState<
-    "all" | "in-house" | "departed" | "reservation" | "cancelled"
+    "all" | "it-manager" | "Supervisor" | "Receptionist" | "Staff"
   >("all");
-  const { bookings, bookingsLoading } = useBookings();
-
+  const { users, usersLoading } = useGetUsers();
   const [searchValue, setSearchValue] = useState("");
-
-  const filteredBookings = () => {
-    if (filter === "all") return bookings;
-    if (filter === "in-house") {
-      return bookings?.filter(
-        (booking) => booking.booking_status === "CheckedIn"
-      );
-    }
-    if (filter === "departed") {
-      return bookings?.filter(
-        (booking) => booking.booking_status === "CheckedOut"
-      );
-    }
-    if (filter === "reservation") {
-      return bookings?.filter(
-        (booking) => booking.booking_status === "Reservation"
-      );
-    }
-    if (filter === "cancelled") {
-      return bookings?.filter(
-        (booking) => booking.booking_status === "Cancelled"
-      );
-    }
-  };
-
-  const searchBookings = (bookings: Booking[]): Booking[] => {
-    if (searchValue != "") {
-      return bookings.filter(
-        (booking) =>
-          booking.guest.full_name
-            .toLowerCase()
-            .includes(searchValue.toLowerCase()) ||
-          booking.guest.email.toLowerCase().includes(searchValue.toLowerCase())
-      );
-    }
-    return bookings;
-  };
-
+  const { onOpen } = useNewUser();
   return (
     <main className="px-6">
-      <h3 className="text-lg font-medium">Bookings</h3>
+      <h3 className="text-lg font-medium">Manage Users</h3>
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <div className="space-x-6">
@@ -70,51 +31,51 @@ export default function Booking() {
                   "underline hover:underline underline-offset-8 text-primary"
               )}
             >
-              All bookings
+              All users
             </Button>
             <Button
               variant="link"
-              onClick={() => setFilter("in-house")}
+              onClick={() => setFilter("it-manager")}
               className={cn(
                 "hover:no-underline px-0 font-medium text-slate-700",
-                filter === "in-house" &&
+                filter === "it-manager" &&
                   "underline hover:underline underline-offset-8 text-primary"
               )}
             >
-              In House
+              IT / Manager
             </Button>
             <Button
               variant="link"
-              onClick={() => setFilter("departed")}
+              onClick={() => setFilter("Supervisor")}
               className={cn(
                 "hover:no-underline px-0 font-medium text-slate-700",
-                filter === "departed" &&
+                filter === "Supervisor" &&
                   "underline hover:underline underline-offset-8 text-primary"
               )}
             >
-              Departed
+              Supervisor
             </Button>
             <Button
               variant="link"
-              onClick={() => setFilter("reservation")}
+              onClick={() => setFilter("Receptionist")}
               className={cn(
                 "hover:no-underline px-0 font-medium text-slate-700",
-                filter === "reservation" &&
+                filter === "Receptionist" &&
                   "underline hover:underline underline-offset-8 text-primary"
               )}
             >
-              Reservation
+              Receptionist
             </Button>
             <Button
               variant="link"
-              onClick={() => setFilter("cancelled")}
+              onClick={() => setFilter("Staff")}
               className={cn(
                 "hover:no-underline px-0 font-medium text-slate-700",
-                filter === "cancelled" &&
+                filter === "Staff" &&
                   "underline hover:underline underline-offset-8 text-primary"
               )}
             >
-              Cancelled
+              Other
             </Button>
           </div>
           <Input
@@ -125,15 +86,12 @@ export default function Booking() {
         </div>
 
         <div className="flex gap-x-3 items-center">
-          <DatePicker />
-          <Button className="flex items-center gap-x-2" asChild>
-            <Link to="/bookings/new">
-              <Plus className="size-4 " /> Create new booking
-            </Link>
+          <Button onClick={onOpen} className="flex items-center gap-x-2">
+            <Plus className="size-4 " /> Add new user
           </Button>
         </div>
       </div>
-      {bookingsLoading && (
+      {usersLoading && (
         <div className="mt-4 bg-white drop-shadow-sm p-4 space-y-2">
           {[...Array(6)].map((_, index) => (
             <div key={index} className="grid grid-cols-7">
@@ -148,12 +106,9 @@ export default function Booking() {
           ))}
         </div>
       )}
-      {bookings && (
+      {users && (
         <div className="mt-6 bg-white drop-shadow-sm p-4 rounded-md">
-          <DataTable
-            columns={columns}
-            data={searchBookings(filteredBookings() as Booking[])}
-          />
+          <DataTable columns={columns} data={users} />
         </div>
       )}
     </main>

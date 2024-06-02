@@ -27,6 +27,7 @@ func NewUserHandler(db database.Service) *UserHandler {
 func usersRouter(handler *UserHandler) chi.Router {
 	router := chi.NewRouter()
 	router.With(middlewares.IsLoggedIn, middlewares.IsLevel4).Post("/", handler.handleRegisterUser)
+	router.With(middlewares.IsLoggedIn, middlewares.IsLevel4).Get("/", handler.handlerGetUsers)
 	router.Post("/login", handler.handleLoginUser)
 	router.With(middlewares.IsLoggedIn).Get("/me", handler.handleGetCurrentUser)
 	router.With(middlewares.IsLoggedIn).Get("/{id}", handler.handleGetUser)
@@ -114,7 +115,7 @@ func (handler *UserHandler) handleLoginUser(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	utils.Encode(w, http.StatusOK, map[string]string{"token": token})
+	utils.Encode(w, http.StatusOK, map[string]interface{}{"token": token, "user": user})
 }
 
 func (handler *UserHandler) handleGetCurrentUser(w http.ResponseWriter, r *http.Request) {
@@ -257,4 +258,13 @@ func (handler *UserHandler) handleChangePasswordUser(w http.ResponseWriter, r *h
 	}
 
 	utils.Encode(w, http.StatusOK, map[string]string{"message": "Password Updated"})
+}
+
+func (handler *UserHandler) handlerGetUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := handler.db.GetUsers()
+	if err != nil {
+		utils.ServerError(w, r, err)
+		return
+	}
+	utils.Encode(w, http.StatusOK, users)
 }

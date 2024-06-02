@@ -6,9 +6,9 @@ import Dashboard from "@/pages/Dashboard";
 import ErrorPage from "@/pages/ErrorPage";
 import Guest from "@/pages/Guest";
 import Login from "@/pages/Login";
+import ManageUsers from "@/pages/ManageUser";
 import Protected from "@/pages/Protected";
 import Room from "@/pages/Room";
-import Settings from "@/pages/Settings";
 import { createBrowserRouter } from "react-router-dom";
 
 export const router = createBrowserRouter([
@@ -37,8 +37,8 @@ export const router = createBrowserRouter([
         element: <Booking />,
       },
       {
-        path: "/settings",
-        element: <Settings />,
+        path: "/manage-users",
+        element: <ManageUsers />,
       },
       {
         path: "/bookings/new",

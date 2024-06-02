@@ -1,3 +1,4 @@
+import useUser from "@/hooks/useUser";
 import { cn } from "@/lib/utils";
 import {
   BedDouble,
@@ -5,7 +6,7 @@ import {
   Home,
   LogOut,
   LucideIcon,
-  Settings,
+  UserCogIcon,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -55,14 +56,15 @@ const routes: SidebarLink[] = [
     icon: Calendar,
   },
   {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
+    title: "Manage Users",
+    href: "/manage-users",
+    icon: UserCogIcon,
   },
 ];
 
 export default function Sidebar() {
   const { pathname } = useLocation();
+  const { user } = useUser();
   return (
     <div className="">
       <div className="flex h-full max-h-screen flex-col gap-2">
@@ -73,6 +75,13 @@ export default function Sidebar() {
                 route.href === "/"
                   ? pathname === route.href
                   : pathname.startsWith(route.href);
+
+              if (
+                parseInt(user.user.security_level) <= 4 &&
+                route.href === "/manage-users"
+              ) {
+                return null;
+              }
               return (
                 <SidebarItem key={route.title} active={isActive} link={route} />
               );

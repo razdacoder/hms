@@ -27,6 +27,7 @@ type Service interface {
 	GetStats(time.Time) (map[string]interface{}, error)
 
 	// User
+	GetUsers() ([]models.User, error)
 	CreateUser(*types.CreateUserPayload) error
 	GetUserByUsername(string) (*models.User, error)
 	UserExists(string) (bool, error)
