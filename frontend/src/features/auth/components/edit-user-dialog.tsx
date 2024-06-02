@@ -1,11 +1,6 @@
 import Loader from "@/components/Loader";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -39,15 +34,22 @@ const formSchema = z.object({
 export type EditUserFormValues = z.input<typeof formSchema>;
 
 export default function EditUserDialog() {
-  const { isOpen, onClose } = useEditUserDialog();
+  const { isOpen, onClose, user } = useEditUserDialog();
   const editUserMutation = useEditUser();
+  const isPending = editUserMutation.isPending;
+
   const form = useForm<EditUserFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {},
+    defaultValues: {
+      first_name: user?.first_name,
+      last_name: user?.last_name,
+      username: user?.username,
+      security_level: user?.security_level,
+    },
   });
   function onSubmit(values: EditUserFormValues) {
     editUserMutation.mutate(
-      { id: "", values },
+      { id: user?.id as string, values },
       {
         onSuccess: () => {
           onClose();
@@ -59,8 +61,7 @@ export default function EditUserDialog() {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update user</DialogTitle>
-          <DialogDescription>Update user details</DialogDescription>
+          <DialogTitle>Update {user?.first_name} info</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
@@ -71,7 +72,7 @@ export default function EditUserDialog() {
                 <FormItem>
                   <FormLabel>Firstname</FormLabel>
                   <FormControl>
-                    <Input disabled={editUserMutation.isPending} {...field} />
+                    <Input disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,7 +85,7 @@ export default function EditUserDialog() {
                 <FormItem>
                   <FormLabel>Lastname</FormLabel>
                   <FormControl>
-                    <Input disabled={editUserMutation.isPending} {...field} />
+                    <Input disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -97,7 +98,7 @@ export default function EditUserDialog() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input disabled={editUserMutation.isPending} {...field} />
+                    <Input disabled={isPending} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,7 +111,7 @@ export default function EditUserDialog() {
                 <FormItem>
                   <FormLabel>Security Level</FormLabel>
                   <Select
-                    disabled={editUserMutation.isPending}
+                    disabled={isPending}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
@@ -131,7 +132,7 @@ export default function EditUserDialog() {
               )}
             />
             <Button
-              disabled={editUserMutation.isPending}
+              disabled={isPending}
               className="w-full flex items-center gap-x-2"
             >
               {editUserMutation.isPending && <Loader />}

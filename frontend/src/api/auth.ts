@@ -1,6 +1,7 @@
 import { EditUserFormValues } from "@/features/auth/components/edit-user-dialog";
 import { NewUserFormValues } from "@/features/auth/components/new-user-dialog";
 import { LoginFormValues } from "@/pages/Login";
+import { ChangePasswordValues } from "./../features/auth/components/change-pass-dialog";
 import { api } from "./api";
 
 export const login = async (values: LoginFormValues) => {
@@ -31,8 +32,27 @@ export const createUser = async (values: NewUserFormValues) => {
 
 export const updateUser = async (id: string, values: EditUserFormValues) => {
   const response = await api.patch(`/users/${id}`, values);
-  if (response.status != 201) {
+  if (response.status != 200) {
     throw new Error("Could not update user");
+  }
+  return response.data;
+};
+
+export const getUser = async (id: string) => {
+  const response = await api.get(`/users/${id}`);
+  if (response.status != 200) {
+    throw new Error("Could not get user");
+  }
+  return response.data as User;
+};
+
+export const changePassword = async (
+  id: string,
+  values: ChangePasswordValues
+) => {
+  const response = await api.post(`/users/${id}/change-password`, values);
+  if (response.status != 200) {
+    throw new Error("Could not update password");
   }
   return response.data;
 };
